@@ -1,0 +1,11 @@
+{
+    "default_model": "flux",
+    "default_width": 1024,
+    "default_height": 1024,
+    "default_nologo": true,
+    "default_enhance": false,
+    "default_private": false,
+    "default_safe": false,
+    "default_preview_width": 146,
+    "default_preview_height": 146
+}
