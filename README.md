@@ -122,4 +122,4 @@ python-dotenv
 
 - [Pollinations.AI](https://pollinations.ai/) 提供的 API 服务。
 - Python 社区提供的优秀库支持（如 `tkinter`、`requests`、`Pillow`）。
-- 灵感来源于 [Dealsbe](https://dealsbe.com)，为开发者和初创公司提供经济实惠的软件解决方案。
+- 灵感来源于Pollinations.AI 提供的免费 API 生成 AI 图像，为开发者提供经济高效的解决方案。
