@@ -27,9 +27,10 @@ Version 1.0
 ### 安装步骤 -none
 
 1. **克隆或下载项目**
+
    ```bash
-  git clone https://github.com/your-username/pollinations-ai-image-generator.git
-  cd pollinations-ai-image-generator
+   git clone https://github.com/your-username/pollinations-ai-image-generator.git
+   cd pollinations-ai-image-generator
    ```
 
 2. **安装依赖**
