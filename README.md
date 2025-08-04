@@ -24,12 +24,12 @@ Version 1.0
 - pip (Python 包管理器)
 - 网络连接（用于调用 Pollinations.AI API）
 
-### 安装步骤
+### 安装步骤 -none
 
 1. **克隆或下载项目**
    ```bash
-  [X] git clone https://github.com/your-username/pollinations-ai-image-generator.git
-  [X] cd pollinations-ai-image-generator
+  git clone https://github.com/your-username/pollinations-ai-image-generator.git
+  cd pollinations-ai-image-generator
    ```
 
 2. **安装依赖**
