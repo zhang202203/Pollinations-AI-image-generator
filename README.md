@@ -1,7 +1,7 @@
 # Pollinations.AI 图像生成器
 
 ## 版本信息
-Version 1.0
+Version 1.1
 
 
 
@@ -16,6 +16,12 @@ Version 1.0
 - 详细的日志记录，保存至 `logs/` 目录
 - 可配置的默认参数，通过 `config.json` 设置
 - 支持多种 AI 模型选择（例如 `flux`、`gptimage`）
+- 添加引用(Referrer)参数支持，用于基于引用的身份验证
+- 改进的进度条显示，无文字设计且居中显示在屏幕中央
+- 图像生成成功后显示分辨率（原始尺寸）和文件大小信息
+- 状态栏位置优化，分为左右两部分显示：
+  - 左侧：显示图像生成状态和信息
+  - 右侧：显示图像保存状态和路径
 
 ## 安装指南
 
@@ -24,10 +30,9 @@ Version 1.0
 - pip (Python 包管理器)
 - 网络连接（用于调用 Pollinations.AI API）
 
-### 安装步骤 -none
+### 安装步骤
 
 1. **克隆或下载项目**
-
    ```bash
    git clone https://github.com/your-username/pollinations-ai-image-generator.git
    cd pollinations-ai-image-generator
@@ -54,6 +59,7 @@ Version 1.0
    - **模型选择**: 从下拉菜单中选择 AI 模型（如 `flux` 或 `gptimage`）。
    - **图像尺寸**: 设置宽度和高度（默认 1024x1024）。
    - **种子值**: 可选，设置后可复现相同图像（默认 42）。
+   - **引用(Referrer)**: 可选，用于基于引用的身份验证（默认空）。
    - **高级选项**: 勾选相应选项设置 `nologo`（无水印）、`enhance`（增强）、`private`（私有模式）和 `safe`（安全模式）。
 
 3. **生成图像**
