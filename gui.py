@@ -23,6 +23,14 @@ class ImageGeneratorGUI:
         self.root.title("Pollinations.AI 图像生成器")
         self.root.geometry("900x700")
         self.root.resizable(True, True)
+
+        # 窗口居中
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
         
         # 设置主题样式
         self.style = ttk.Style()
@@ -75,11 +83,19 @@ class ImageGeneratorGUI:
         self.height_entry.insert(0, str(self.config["default_height"]))
         self.height_entry.pack(side="left")
         
-        # 种子值
-        ttk.Label(param_frame, text="种子值:", anchor="w").grid(row=4, column=0, sticky="w", pady=5)
-        self.seed_entry = ttk.Entry(param_frame, width=10)
+        # 种子值和引用
+        seed_referrer_frame = ttk.Frame(param_frame)
+        seed_referrer_frame.grid(row=4, column=0, columnspan=4, sticky="w", pady=5)
+
+        ttk.Label(seed_referrer_frame, text="种子值:").pack(side="left", padx=(0, 10))
+        self.seed_entry = ttk.Entry(seed_referrer_frame, width=10)
         self.seed_entry.insert(0, "42")
-        self.seed_entry.grid(row=4, column=1, sticky="w", pady=5)
+        self.seed_entry.pack(side="left", padx=(0, 20))
+
+        ttk.Label(seed_referrer_frame, text="引用:").pack(side="left", padx=(0, 10))
+        self.referrer_entry = ttk.Entry(seed_referrer_frame, width=30)
+        self.referrer_entry.insert(0, "")
+        self.referrer_entry.pack(side="left")
         
         # 高级选项
         ttk.Label(param_frame, text="高级选项:", anchor="w").grid(row=5, column=0, sticky="w", pady=10)
@@ -109,9 +125,17 @@ class ImageGeneratorGUI:
         self.save_button = ttk.Button(button_frame, text="保存图像", command=self.save_image, state="disabled")
         self.save_button.pack(side="left", padx=10)
         
-        # 状态栏
-        self.status_label = ttk.Label(self.main_frame, text="请输入提示词并点击生成", anchor="w")
-        self.status_label.pack(fill="x", pady=(10, 15))
+        # 状态栏框架
+        self.status_frame = ttk.Frame(self.main_frame)
+        self.status_frame.pack(side="bottom", fill="x", pady=(10, 15), padx=10)
+
+        # 左侧状态栏标签
+        self.status_label_left = ttk.Label(self.status_frame, text="请输入提示词并点击生成", anchor="w")
+        self.status_label_left.pack(side="left")
+
+        # 右侧状态栏标签
+        self.status_label_right = ttk.Label(self.status_frame, text="", anchor="e")
+        self.status_label_right.pack(side="right")
         
         # 图像显示区域
         image_frame = ttk.LabelFrame(self.main_frame, text="预览", padding=15)
@@ -143,33 +167,33 @@ class ImageGeneratorGUI:
         model = self.model_var.get()
         
         # 更新状态和按钮
-        self.status_label.config(text="正在生成图像，请稍候...")
+        self.status_label_left.config(text="正在生成图像，请稍候...")
         self.generate_button.config(state="disabled")
         self.save_button.config(state="disabled")
         
-        # 创建进度条
+        # 创建进度条窗口
         progress_window = tk.Toplevel(self.root)
-        progress_window.title("生成中")
-        progress_window.geometry("300x100")
+        progress_window.overrideredirect(True)  # 无边框窗口
+        progress_window.geometry("300x30")
         progress_window.resizable(False, False)
         
         # 居中显示进度窗口
-        progress_window.transient(self.root)
-        progress_window.grab_set()
+        x = (self.root.winfo_screenwidth() // 2) - 150
+        y = (self.root.winfo_screenheight() // 2) - 15
+        progress_window.geometry('300x30+{}+{}'.format(x, y))
         
-        progress_label = ttk.Label(progress_window, text="图像生成中...")
-        progress_label.pack(pady=10)
-        
-        progress_bar = ttk.Progressbar(progress_window, orient="horizontal", length=250, mode="indeterminate")
-        progress_bar.pack(pady=10)
+        # 创建进度条（无文字）
+        progress_bar = ttk.Progressbar(progress_window, orient="horizontal", length=300, mode="indeterminate")
+        progress_bar.pack(fill="both", expand=True)
         progress_bar.start()
         
         self.root.update()
         
         try:
             success, result = self.generate_image_func(
-                prompt, width, height, seed, model,
-
+                prompt, width, height, seed,
+                referrer=self.referrer_entry.get(),
+                model=model,
                 nologo=self.nologo_var.get(),
                 enhance=self.enhance_var.get(),
                 private=self.private_var.get(),
@@ -184,35 +208,40 @@ class ImageGeneratorGUI:
             self.current_image_data = result
             try:
                 img = Image.open(io.BytesIO(result))
-                # 计算调整后的尺寸，保持宽高比，确保完整显示在预览框
-                # 设置固定预览高度为160像素
-                preview_height = 160
+                # 保存原始图像尺寸
+                original_width, original_height = img.size
                 
-                img_width, img_height = img.size
+                # 计算调整后的尺寸，保持宽高比，确保完整显示在预览框
+                # 设置固定预览高度为200像素
+                preview_height = 200
+                
                 # 根据图像原始比例计算宽度
-                ratio = preview_height / img_height
-                preview_width = int(img_width * ratio)
+                ratio = preview_height / original_height
+                preview_width = int(original_width * ratio)
                 
                 # 确保宽度至少为1像素
                 if preview_width <= 1:
                     preview_width = 1
                 
                 # 计算调整后的尺寸，保持宽高比
-                ratio = preview_height / img_height
-                new_width = int(img_width * ratio)
-                new_height = int(img_height * ratio)
+                new_width = int(original_width * ratio)
+                new_height = int(original_height * ratio)
                 img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
                 
                 photo = ImageTk.PhotoImage(img)
                 self.image_label.config(image=photo, text="")
                 self.image_label.image = photo
-                self.status_label.config(text="图像生成成功，点击保存图像")
+                # 获取图像文件大小
+                file_size = len(result) / 1024  # 转换为KB
+                self.status_label_left.config(text=f"图像生成成功 ({original_width}x{original_height}, {file_size:.2f}KB)，点击保存图像")
+                self.status_label_right.config(text="")
                 self.save_button.config(state="normal")
             except Exception as e:
-                self.status_label.config(text=f"显示图像失败: {str(e)}")
+                self.status_label_left.config(text=f"显示图像失败: {str(e)}")
+                self.status_label_right.config(text="")
                 logging.error(f"图像显示失败: {str(e)}")
         else:
-            self.status_label.config(text=result)
+            self.status_label_left.config(text=result)
             messagebox.showerror("生成失败", result)
         
         self.generate_button.config(state="normal")
@@ -226,6 +255,6 @@ class ImageGeneratorGUI:
         file_path = filedialog.asksaveasfilename(defaultextension=".jpg", filetypes=[("JPEG files", "*.jpg")])
         if file_path:
             if save_image(self.current_image_data, file_path):
-                self.status_label.config(text=f"图像已保存为 {file_path}")
+                self.status_label_right.config(text=f"图像已保存为 {file_path}")
             else:
-                self.status_label.config(text="图像保存失败")
+                self.status_label_right.config(text="图像保存失败")
