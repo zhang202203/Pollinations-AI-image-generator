@@ -1,12 +1,12 @@
-import requests
 import urllib.parse
 import logging
+import requests
 from utils import setup_logging
 
 # 初始化日志
 setup_logging()
 
-def generate_image(prompt, width, height, seed, model="flux", nologo=True, enhance=False, private=False, safe=True):
+def generate_image(prompt, width, height, seed, referrer="", model="flux", nologo=True, enhance=False, private=False, safe=True):
     """
     调用 Pollinations AI API 生成图像，并返回图像数据或错误信息。
     
@@ -37,6 +37,10 @@ def generate_image(prompt, width, height, seed, model="flux", nologo=True, enhan
         "private": str(private).lower(),
         "safe": str(safe).lower()
     }
+
+    # 如果referrer不为空，则添加到参数中
+    if referrer:
+        params["referrer"] = referrer
     
     try:
         logging.info(f"发送 API 请求: {url}, 参数: {params}")
