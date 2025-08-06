@@ -121,6 +121,9 @@ class ImageGeneratorGUI:
         self.save_button = ttk.Button(button_frame, text="保存图像", command=self.save_image, state="disabled", style="Accent.TButton")
         self.save_button.pack(side="left", padx=10)
         
+        self.reset_button = ttk.Button(button_frame, text="重置参数", command=self.reset_parameters)
+        self.reset_button.pack(side="left", padx=10)
+        
         # 状态栏框架
         self.status_frame = ttk.Frame(self.main_frame)
         self.status_frame.pack(side="bottom", fill="x", pady=(10, 15), padx=10)
@@ -305,3 +308,37 @@ class ImageGeneratorGUI:
         x = (self.root.winfo_screenwidth() // 2) - (width // 2)
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")
+        
+    def reset_parameters(self):
+        """重置所有参数为默认值"""
+        # 重置提示词
+        self.prompt_entry.delete(0, tk.END)
+        self.prompt_entry.insert(0, "A beautiful sunset over the ocean")
+        
+        # 重置宽度和高度
+        self.width_entry.delete(0, tk.END)
+        self.width_entry.insert(0, str(self.config["default_width"]))
+        
+        self.height_entry.delete(0, tk.END)
+        self.height_entry.insert(0, str(self.config["default_height"]))
+        
+        # 重置模型选择
+        self.model_var.set(self.config["default_model"])
+        
+        # 重置种子值
+        self.seed_entry.delete(0, tk.END)
+        self.seed_entry.insert(0, "42")
+        
+        # 重置引用
+        self.referrer_entry.delete(0, tk.END)
+        self.referrer_entry.insert(0, "")
+        
+        # 重置高级选项
+        self.nologo_var.set(self.config["default_nologo"])
+        self.enhance_var.set(self.config["default_enhance"])
+        self.private_var.set(self.config["default_private"])
+        self.safe_var.set(self.config["default_safe"])
+        
+        # 更新状态栏
+        self.status_label_left.config(text="参数已重置为默认值")
+        self.status_label_right.config(text="")
